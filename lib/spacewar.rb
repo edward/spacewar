@@ -13,28 +13,170 @@ include Gosu
 #
 # Image.autoload_dirs << File.join(self.root, "data", "my_image_dir")  
 # 
+
+DEBUG = false
+G_CONST = 2000
+
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 800
 class Spacewar < Chingu::Window
   def initialize
-    super(640,480,false)              # leave it blank and it will be 800,600,non fullscreen
-    self.input = { :escape => :exit } # exits example on Escape
+    super(SCREEN_WIDTH,SCREEN_HEIGHT)
+    self.input = {:esc => :exit}
+    @planet = Planet.create
     
-    @player = Player.create(:x => 200, :y => 200, :image => Image["spaceship.png"])
-    @player.input = { :holding_left => :move_left, :holding_right => :move_right, 
-                      :holding_up => :move_up, :holding_down => :move_down }
+    @player = Player.create(:zorder => 2, :x=>120, :y=>140)
+    @score = 0
+    @score_text = Text.create("Score: #{@score}", :x => 10, :y => 10, :zorder => 55, :size=>20)
+  end
+
+  def update
+    super
+
+    if rand(100) < 4 && Star.all.size < 25
+      Star.create
+    end
+    
+    #
+    # Collide @player with all instances of class Star
+    #
+    @player.each_collision(Star) do |player, star| 
+      star.destroy
+      @score+=10
+    end
+    
+    @planet.each_collision(Star) do |planet, star| 
+      star.destroy
+      @score-=5
+    end
+    
+    @player.adjust_gravity(@planet)
+    
+    Star.all.each{|star| star.adjust_gravity(@planet)}
+    
+    @planet.each_collision(Player) do |planet, player| 
+      player.destroy
+      @score-=10000
+      @player = Player.create(:zorder => 2, :x=>120, :y=>140)
+    end
+    
+    
+    @score_text.text = "Score: #{@score}"
+    self.caption = "Chingu Game - " + @score_text.text
+  end
+end
+
+# extend game object with gravity features
+class GameObject
+  def adjust_gravity(source)
+    # Calculate vector to source
+    vect_x = -(self.x - source.x)
+    vect_y = -(self.y - source.y)
+    
+    # Get length of vector to source
+    length = (vect_x**2 + vect_y**2)**0.5
+    
+    # Calculate unit vector
+    vect_x = vect_x/length
+    vect_y = vect_y/length
+    
+    # Diminish unit vector as 1/r**2
+    vect_x *= (1/length ** 2)
+    vect_y *= (1/length ** 2)
+    
+    # Scale to strength of gravity and apply
+    self.velocity_x += vect_x * G_CONST
+    self.velocity_y += vect_y * G_CONST
+  end
+end
+
+class Player < GameObject
+  has_trait :bounding_circle, :debug => DEBUG
+  has_traits :collision_detection, :effect, :velocity
+  
+  def initialize(options={})
+    super(options)
+    @image = Image["Starfighter.bmp"]
+    self.input = {:holding_right=>:turn_right, :holding_left=>:turn_left, :holding_up=>:accelerate}
+    self.max_velocity = 1
+  end
+  
+  def accelerate
+    self.velocity_x += Gosu::offset_x(self.angle, 0.5)*self.max_velocity
+    self.velocity_y += Gosu::offset_y(self.angle, 0.5)*self.max_velocity
+  end
+  
+  def turn_right
+    # The same can be achieved without trait 'effect' as: self.angle += 4.5
+    rotate(4.5)
+  end
+  
+  def turn_left
+    # The same can be achieved without trait 'effect' as: self.angle -= 4.5
+    rotate(-4.5)
   end
   
   def update
-    super
-    self.caption = "FPS: #{self.fps} milliseconds_since_last_tick: #{self.milliseconds_since_last_tick}"
+    
+    self.velocity_x *= 0.99 # dampen the movement
+    self.velocity_y *= 0.99
+    
+    @x %= $window.width # wrap around the screen
+    @y %= $window.height
   end
 end
 
-class Player < Chingu::GameObject  
-  def move_left;  @x -= 1; end
-  def move_right; @x += 1; end
-  def move_up;    @y -= 1; end
-  def move_down;  @y += 1; end
+class Planet < GameObject
+  has_trait :bounding_circle, :debug => true
+  has_trait :collision_detection
+  
+  def initialize(options={})
+    super(:zorder=>1)
+    @image = Image["planet.png"]
+    self.color = Gosu::Color.new(0xff000000)
+    self.color.red = rand(255 - 40) + 40
+    self.color.green = rand(255 - 40) + 40
+    self.color.blue = rand(255 - 40) + 40
+    self.x = $window.width/2
+    self.y = $window.height/2
+
+    cache_bounding_circle
+  end
 end
 
+class Star < GameObject
+  has_trait :bounding_circle, :debug => DEBUG
+  has_traits :collision_detection, :velocity
+  
+  def initialize(options={})
+    super(:zorder=>1)
+    @animation = Chingu::Animation.new(:file => media_path("Star.png"), :size => [25,25])
+    @image = @animation.next
+    self.color = Gosu::Color.new(0xff000000)
+    self.color.red = rand(255 - 40) + 40
+    self.color.green = rand(255 - 40) + 40
+    self.color.blue = rand(255 - 40) + 40
+    self.x =rand * $window.width
+    self.y =rand * $window.height
+    self.velocity_x = rand(10)
+    self.velocity_y = rand(10)
+    
+    #
+    # A cached bounding circle will not adapt to changes in size, but it will follow objects X / Y
+    # Same is true for "cache_bounding_box"
+    #
+    cache_bounding_circle
+  end
+  
+  def update
+    @x %= $window.width # wrap around the screen
+    @y %= $window.height
+    
+    # Move the animation forward by fetching the next frame and putting it into @image
+    # @image is drawn by default by GameObject#draw
+    @image = @animation.next
+  end
+
+end
 
 Spacewar.new.show
