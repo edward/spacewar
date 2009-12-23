@@ -1,4 +1,4 @@
-# require 'rubygems'
+require 'rubygems'
 # require File.join(File.dirname($0), "..", "lib", "chingu")
 require 'gosu'
 require 'chingu'
