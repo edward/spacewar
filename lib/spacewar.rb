@@ -3,6 +3,7 @@
 require 'gosu'
 require 'chingu'
 include Gosu
+include Chingu
 
 #
 # A minimalistic Chingu example.
@@ -25,9 +26,10 @@ class Spacewar < Chingu::Window
     self.input = {:esc => :exit}
     @planet = Planet.create
     
-    @player = Player.create(:zorder => 2, :x=>120, :y=>140)
+    @player1 = Player.create({:holding_right=>:turn_right, :holding_left=>:turn_left, :holding_up=>:accelerate}, :zorder => 2, :x=>180, :y=>240, :image => 'Starfighter_p1.bmp')
+    @player2 = Player.create({:holding_d=>:turn_right, :holding_a=>:turn_left, :holding_w=>:accelerate}, :zorder => 2, :x=>400, :y=>240, :image => 'Starfighter_p2.bmp')
     @score = 0
-    @score_text = Text.create("Score: #{@score}", :x => 10, :y => 10, :zorder => 55, :size=>20)
+    @score_text = Chingu::Text.create("Score: #{@score}", :x => 10, :y => 10, :zorder => 55, :size=>20)
   end
 
   def update
@@ -40,26 +42,37 @@ class Spacewar < Chingu::Window
     #
     # Collide @player with all instances of class Star
     #
-    @player.each_collision(Star) do |player, star| 
+    @player1.each_collision(Star) do |player, star| 
       star.destroy
       @score+=10
     end
     
-    @planet.each_collision(Star) do |planet, star| 
+    @player2.each_collision(Star) do |player, star|
       star.destroy
       @score-=5
     end
     
-    @player.adjust_gravity(@planet)
+    @player1.adjust_gravity(@planet)
+    @player2.adjust_gravity(@planet)
     
     Star.all.each{|star| star.adjust_gravity(@planet)}
+    
+    @player1.each_collision(Player) do |player1, player2|
+      if player2 == @player2
+        player1.destroy
+        player2.destroy
+        @player1 = Player.create({:holding_right=>:turn_right, :holding_left=>:turn_left, :holding_up=>:accelerate}, :zorder => 2, :x=>180, :y=>240, :image => 'Starfighter_p1.bmp')
+        @player2 = Player.create({:holding_d=>:turn_right, :holding_a=>:turn_left, :holding_w=>:accelerate}, :zorder => 2, :x=>400, :y=>240, :image => 'Starfighter_p2.bmp')
+      end
+    end
+
     
     @planet.each_collision(Player) do |planet, player| 
       player.destroy
       @score-=10000
-      @player = Player.create(:zorder => 2, :x=>120, :y=>140)
     end
     
+
     
     @score_text.text = "Score: #{@score}"
     self.caption = "Chingu Game - " + @score_text.text
@@ -67,7 +80,7 @@ class Spacewar < Chingu::Window
 end
 
 # extend game object with gravity features
-class GameObject
+class Chingu::GameObject
   def adjust_gravity(source)
     # Calculate vector to source
     vect_x = -(self.x - source.x)
@@ -90,14 +103,14 @@ class GameObject
   end
 end
 
-class Player < GameObject
+class Player < Chingu::GameObject
   has_trait :bounding_circle, :debug => DEBUG
   has_traits :collision_detection, :effect, :velocity
   
-  def initialize(options={})
+  def initialize(input, options={})
     super(options)
-    @image = Image["Starfighter.bmp"]
-    self.input = {:holding_right=>:turn_right, :holding_left=>:turn_left, :holding_up=>:accelerate}
+    @image = Image[options[:image]]
+    self.input = input
     self.max_velocity = 1
   end
   
@@ -126,7 +139,7 @@ class Player < GameObject
   end
 end
 
-class Planet < GameObject
+class Planet < Chingu::GameObject
   has_trait :bounding_circle, :debug => true
   has_trait :collision_detection
   
@@ -144,7 +157,7 @@ class Planet < GameObject
   end
 end
 
-class Star < GameObject
+class Star < Chingu::GameObject
   has_trait :bounding_circle, :debug => DEBUG
   has_traits :collision_detection, :velocity
   
