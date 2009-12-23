@@ -8,6 +8,6 @@ rescue LoadError
   abort "spacewar was not installed for some reason"
 end
 
-Signal.trap("INT") { puts; exit }
-
 Spacewar.new.show
+
+# Signal.trap("INT") { puts; exit }
