@@ -3,4 +3,6 @@ $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
 
 require 'spacewar/spacewar'
 
-Spacewar::Game.new.show
+module Spacewar
+  VERSION = '0.0.1'
+end

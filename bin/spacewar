@@ -8,6 +8,8 @@ rescue LoadError
   abort "spacewar was not installed for some reason"
 end
 
-Spacewar.new.show
+Spacewar::Game.new.show
+
+# Spacewar.play
 
 # Signal.trap("INT") { puts; exit }

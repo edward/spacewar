@@ -6,9 +6,6 @@ include Gosu
 include Chingu
 
 module Spacewar
-  VERSION = '0.0.1'
-  
-  DEBUG = false
   G_CONST = 2000
 
   SCREEN_WIDTH = 1280
@@ -25,12 +22,26 @@ module Spacewar
   #
   class Game < Chingu::Window
     def initialize
-      super(SCREEN_WIDTH,SCREEN_HEIGHT)
+      super(Spacewar::SCREEN_WIDTH, Spacewar::SCREEN_HEIGHT)
       self.input = {:esc => :exit}
+      
       @planet = Planet.create
 
-      @player1 = Player.create({:holding_right=>:turn_right, :holding_left=>:turn_left, :holding_up=>:accelerate}, :zorder => 2, :x=>180, :y=>240, :image => 'Starfighter_p1.bmp')
-      @player2 = Player.create({:holding_d=>:turn_right, :holding_a=>:turn_left, :holding_w=>:accelerate}, :zorder => 2, :x=>400, :y=>240, :image => 'Starfighter_p2.bmp')
+      @player1 = Player.create({:holding_right => :turn_right,
+                                :holding_left => :turn_left,
+                                :holding_up => :accelerate},
+                                :zorder => 2,
+                                :x => 180,
+                                :y => 240,
+                                :image => 'Starfighter_p1.bmp')
+      
+      @player2 = Player.create({:holding_d => :turn_right,
+                                :holding_a => :turn_left,
+                                :holding_w => :accelerate},
+                                :zorder => 2,
+                                :x => 400,
+                                :y => 240,
+                                :image => 'Starfighter_p2.bmp')
       @score = 0
       @score_text = Chingu::Text.create("Score: #{@score}", :x => 10, :y => 10, :zorder => 55, :size=>20)
     end
@@ -98,13 +109,13 @@ module Spacewar
       vect_y *= (1/length ** 2)
 
       # Scale to strength of gravity and apply
-      self.velocity_x += vect_x * G_CONST
-      self.velocity_y += vect_y * G_CONST
+      self.velocity_x += vect_x * Spacewar::G_CONST
+      self.velocity_y += vect_y * Spacewar::G_CONST
     end
   end
 
   class Player < Chingu::GameObject
-    has_trait :bounding_circle, :debug => DEBUG
+    has_trait :bounding_circle, :debug => $DEBUG
     has_traits :collision_detection, :effect, :velocity
 
     def initialize(input, options={})
@@ -130,7 +141,6 @@ module Spacewar
     end
 
     def update
-
       self.velocity_x *= 0.99 # dampen the movement
       self.velocity_y *= 0.99
 
@@ -143,26 +153,26 @@ module Spacewar
     has_trait :bounding_circle, :debug => true
     has_trait :collision_detection
 
-    def initialize(options={})
-      super(:zorder=>1)
+    def initialize(options = {})
+      super(:zorder => 1)
       @image = Image["planet.png"]
       self.color = Gosu::Color.new(0xff000000)
       self.color.red = rand(255 - 40) + 40
       self.color.green = rand(255 - 40) + 40
       self.color.blue = rand(255 - 40) + 40
-      self.x = $window.width/2
-      self.y = $window.height/2
+      self.x = $window.width / 2
+      self.y = $window.height / 2
 
       cache_bounding_circle
     end
   end
 
   class Star < Chingu::GameObject
-    has_trait :bounding_circle, :debug => DEBUG
+    has_trait :bounding_circle, :debug => $DEBUG
     has_traits :collision_detection, :velocity
 
     def initialize(options={})
-      super(:zorder=>1)
+      super(:zorder => 1)
       @animation = Chingu::Animation.new(:file => media_path("Star.png"), :size => [25,25])
       @image = @animation.next
       self.color = Gosu::Color.new(0xff000000)
@@ -190,6 +200,8 @@ module Spacewar
       @image = @animation.next
     end
   end
+  
+  def self.play
+    Game.new.show
+  end
 end
-
-Spacewar::Game.new.show
