@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require "rubygems"
+
+begin
+  gem 'spacewar'
+rescue LoadError
+  # If people are not using gems, the load path must still
+  # be correct.
+  # TODO: Remove the begin / rescue block somehow
+  $:.unshift File.dirname(__FILE__) + '/../lib'
+  retry
+end
+
+Signal.trap("INT") { puts; exit }
+
+Spacewar.new.show
