@@ -2,6 +2,12 @@
 
 Description goes here.
 
+== Dependencies
+
+The Gosu (http://libgosu.org) and Chingu (http://github.com/ippa/chingu) gems are needed to run Spacewar
+  sudo gem install gosu
+  sudo gem install chingu
+
 == Note on Patches/Pull Requests
  
 * Fork the project.
