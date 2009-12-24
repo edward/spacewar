@@ -31,6 +31,7 @@ spec = Gem::Specification.new do |s|
   s.require_path = "lib"
   s.bindir = "bin"
 
+  s.add_dependency('gosu', '>= 0.7.15') # TODO remove when gosu adds this as a dependency
   s.add_dependency('chingu', '>= 0.6.7')
 end
 
