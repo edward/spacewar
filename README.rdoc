@@ -1,12 +1,21 @@
 = Spacewar
 
-Description goes here.
+A brave group-effort by the gentlemen at Ottawa.rb (aka OGRE), spacewar is a legitimate heir to the glory that is the original game you likely played on an xt or more ancient beast of a machine.
 
-== Dependencies
+=== Installation
+For the latest stable version:
 
-The Gosu (http://libgosu.org) and Chingu (http://github.com/ippa/chingu) gems are needed to run Spacewar
-  sudo gem install gosu
-  sudo gem install chingu
+ sudo gem install spacewar
+
+Or from source:
+
+ git clone git://github.com/edward/spacewar.git
+ cd spacewar
+ rake install
+
+=== Usage
+
+  spacewar
 
 == Note on Patches/Pull Requests
  
@@ -20,4 +29,4 @@ The Gosu (http://libgosu.org) and Chingu (http://github.com/ippa/chingu) gems ar
 
 == Copyright
 
-Copyright (c) 2009 Edward Ocampo-Gooding. See LICENSE for details.
+Copyright (c) 2009 Edward Ocampo-Gooding and the OGRE people who actually wrote this. See AUTHORS and LICENSE for details.
