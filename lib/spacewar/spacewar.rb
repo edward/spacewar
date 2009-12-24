@@ -1,28 +1,26 @@
-# require 'rubygems'
 require 'gosu'
 require 'chingu'
 
+# TODO - I'd like to move these includes into the Spacewar module
 include Gosu
 include Chingu
 
-module Spacewar
+module Chingu
+  ROOT = Spacewar::ROOT
+end
+
+module Spacewar  
   G_CONST = 2000
 
   SCREEN_WIDTH = 1280
   SCREEN_HEIGHT = 800
   
-  #
-  # A minimalistic Chingu example.
-  # Chingu::Window provides #update and #draw which calls corresponding methods for all objects based on Chingu::Actors
-  #
-  # Image["picture.png"] is a deployment safe shortcut to Gosu's Image.new and supports multiple locations for "picture.png"
-  # By default current dir, media\ and gfx\ is searched. To add own directories:
-  #
-  # Image.autoload_dirs << File.join(self.root, "data", "my_image_dir")  
-  #
   class Game < Chingu::Window
     def initialize
       super(Spacewar::SCREEN_WIDTH, Spacewar::SCREEN_HEIGHT)
+      
+      Image.autoload_dirs << File.join(ROOT, 'media')
+      
       self.input = {:esc => :exit}
       
       @planet = Planet.create
@@ -75,8 +73,20 @@ module Spacewar
         if player2 == @player2
           player1.destroy
           player2.destroy
-          @player1 = Player.create({:holding_right=>:turn_right, :holding_left=>:turn_left, :holding_up=>:accelerate}, :zorder => 2, :x=>180, :y=>240, :image => 'Starfighter_p1.bmp')
-          @player2 = Player.create({:holding_d=>:turn_right, :holding_a=>:turn_left, :holding_w=>:accelerate}, :zorder => 2, :x=>400, :y=>240, :image => 'Starfighter_p2.bmp')
+          @player1 = Player.create({:holding_right => :turn_right,
+                                    :holding_left => :turn_left,
+                                    :holding_up => :accelerate},
+                                    :zorder => 2,
+                                    :x => 180,
+                                    :y => 240,
+                                    :image => 'Starfighter_p1.bmp')
+          @player2 = Player.create({:holding_d => :turn_right,
+                                    :holding_a => :turn_left,
+                                    :holding_w => :accelerate},
+                                    :zorder => 2,
+                                    :x => 400,
+                                    :y => 240,
+                                    :image => 'Starfighter_p2.bmp')
         end
       end
 
@@ -126,8 +136,8 @@ module Spacewar
     end
 
     def accelerate
-      self.velocity_x += Gosu::offset_x(self.angle, 0.5)*self.max_velocity
-      self.velocity_y += Gosu::offset_y(self.angle, 0.5)*self.max_velocity
+      self.velocity_x += Gosu::offset_x(self.angle, 0.5) * self.max_velocity
+      self.velocity_y += Gosu::offset_y(self.angle, 0.5) * self.max_velocity
     end
 
     def turn_right
@@ -179,8 +189,8 @@ module Spacewar
       self.color.red = rand(255 - 40) + 40
       self.color.green = rand(255 - 40) + 40
       self.color.blue = rand(255 - 40) + 40
-      self.x =rand * $window.width
-      self.y =rand * $window.height
+      self.x = rand * $window.width
+      self.y = rand * $window.height
       self.velocity_x = rand(10)
       self.velocity_y = rand(10)
 

@@ -1,15 +1,4 @@
 #!/usr/bin/env ruby
 
-require "rubygems"
-
-begin
-  require 'spacewar'
-rescue LoadError
-  abort "spacewar was not installed for some reason"
-end
-
-Spacewar::Game.new.show
-
-# Spacewar.play
-
-# Signal.trap("INT") { puts; exit }
+require 'spacewar'
+Spacewar.play
