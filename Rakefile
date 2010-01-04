@@ -33,6 +33,15 @@ spec = Gem::Specification.new do |s|
 
   s.add_dependency('gosu', '>= 0.7.15') # TODO remove when gosu adds this as a dependency
   s.add_dependency('chingu', '>= 0.6.7')
+  
+  s.post_install_message = %q{********************************************************************************
+
+  To play spacewar, just run
+  
+    spacewar
+
+********************************************************************************
+}
 end
 
 Rake::GemPackageTask.new(spec) do |p|
