@@ -34,6 +34,8 @@ spec = Gem::Specification.new do |s|
   s.add_dependency('gosu', '>= 0.7.15') # TODO remove when gosu adds this as a dependency
   s.add_dependency('chingu', '>= 0.6.7')
   
+  s.add_development_dependency('gemcutter', '>= 0.2.1')
+  
   s.post_install_message = %q{********************************************************************************
 
   To play spacewar, just run
