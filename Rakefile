@@ -25,7 +25,7 @@ spec = Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = false
   
-  s.files = %w(Rakefile) + Dir.glob("{bin,lib,test}/**/*")
+  s.files = Dir.glob("{bin,lib}/**/*")
   
   s.require_path = "lib"
   s.bindir = "bin"
