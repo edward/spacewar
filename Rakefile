@@ -25,8 +25,7 @@ spec = Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = false
   
-  s.files = %w(Rakefile) +
-    Dir.glob("{bin,lib,test}/**/*")
+  s.files = %w(Rakefile) + Dir.glob("{bin,lib,test}/**/*")
   
   s.require_path = "lib"
   s.bindir = "bin"
@@ -36,14 +35,15 @@ spec = Gem::Specification.new do |s|
   
   s.add_development_dependency('gemcutter', '>= 0.2.1')
   
-  s.post_install_message = %q{********************************************************************************
+  s.post_install_message = <<INSTALL_MESSAGE
+********************************************************************************
 
   To play spacewar, just run
   
     spacewar
 
 ********************************************************************************
-}
+INSTALL_MESSAGE
 end
 
 Rake::GemPackageTask.new(spec) do |p|
